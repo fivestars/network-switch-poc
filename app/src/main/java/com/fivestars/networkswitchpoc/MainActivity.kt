@@ -9,6 +9,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -67,7 +75,9 @@ class MainActivity : AppCompatActivity() {
                     Log.e("darran", "network is metered: " +connectivityManager.isActiveNetworkMetered)
                     Log.e("darran", "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
                     Log.e("darran", "bound network is: " +connectivityManager.boundNetworkForProcess)
-
+                    GlobalScope.launch {
+                        fetchIp(network)
+                    }
                 }
             })
         }
@@ -105,8 +115,32 @@ class MainActivity : AppCompatActivity() {
                     Log.e("darran", "network is metered: " +connectivityManager.isActiveNetworkMetered)
                     Log.e("darran", "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
                     Log.e("darran", "bound network is: " +connectivityManager.boundNetworkForProcess)
+                    GlobalScope.launch {
+                        fetchIp(network)
+                    }
                 }
             })
         }
+    }
+
+    suspend fun fetchIp(network: Network) = withContext(Dispatchers.IO) {
+
+        try {
+            network.getByName("www.icanhazip.com")
+            val client = OkHttpClient();
+
+            val request = Request.Builder()
+                .url("http://icanhazip.com")
+                .build();
+
+            val response = client.newCall(request).execute()
+            val result = response.body?.string()
+
+            Log.e("darran", "The ip is: $result")
+        } catch (e: Exception) {
+            Log.e("darran", "exception: $e")
+        }
+
+
     }
 }
