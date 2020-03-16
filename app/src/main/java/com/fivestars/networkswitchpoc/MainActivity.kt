@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
                     Toast.makeText(this@MainActivity, "CELLULAR READY", Toast.LENGTH_SHORT).show()
-                    Log.e("darran", "network info is: " +connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE))
+                    Log.e("darran", "network count is: " +connectivityManager.allNetworks.size)
                     Log.e("darran", "network is metered: " +connectivityManager.isActiveNetworkMetered)
                     Log.e("darran", "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
                     Log.e("darran", "bound network is: " +connectivityManager.boundNetworkForProcess)
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
                     Toast.makeText(this@MainActivity, "WIFI READY", Toast.LENGTH_SHORT).show()
-                    Log.e("darran", "network info is: " +connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET))
+                    Log.e("darran", "network info is: " +connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI))
                     Log.e("darran", "network is metered: " +connectivityManager.isActiveNetworkMetered)
                     Log.e("darran", "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
                     Log.e("darran", "bound network is: " +connectivityManager.boundNetworkForProcess)
