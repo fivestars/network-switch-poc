@@ -118,7 +118,10 @@ class MainActivity : AppCompatActivity() {
                     Log.e("darran", "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
                     Log.e("darran", "bound network is: " +connectivityManager.boundNetworkForProcess)
                     GlobalScope.launch {
-                        fetchIp(network)
+                        val ipAddress = fetchIp(network)
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, "IP is: " +ipAddress, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             })
@@ -152,23 +155,26 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    Toast.makeText(this@MainActivity, "WIFI READY", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "ConnectivityManager.TYPE_ETHERNET READY", Toast.LENGTH_SHORT).show()
                     Log.e("darran", "network info is: " +connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET))
                     Log.e("darran", "network is metered: " +connectivityManager.isActiveNetworkMetered)
                     Log.e("darran", "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
                     Log.e("darran", "bound network is: " +connectivityManager.boundNetworkForProcess)
                     GlobalScope.launch {
-                        fetchIp(network)
+                        val ipAddress = fetchIp(network)
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, "IP is: " +ipAddress, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             })
         }
     }
 
-    suspend fun fetchIp(network: Network) = withContext(Dispatchers.IO) {
+    suspend fun fetchIp(network: Network): String? = withContext(Dispatchers.IO) {
 
         try {
-            network.getByName("www.icanhazip.com")
+            Log.v(TAG, "IP for www.icanhazip.com is: " +network.getByName("www.icanhazip.com"))
             val client = OkHttpClient();
 
             val request = Request.Builder()
@@ -177,12 +183,16 @@ class MainActivity : AppCompatActivity() {
 
             val response = client.newCall(request).execute()
             val result = response.body?.string()
-
             Log.e("darran", "The ip is: $result")
+            return@withContext result
         } catch (e: Exception) {
             Log.e("darran", "exception: $e")
         }
 
+        return@withContext null
+    }
 
+    companion object {
+        const val TAG = "NetworkSwitchPOC"
     }
 }
