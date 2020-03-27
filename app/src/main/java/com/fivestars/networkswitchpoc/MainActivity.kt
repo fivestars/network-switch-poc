@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.fivestars.rootutil.RootUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -128,6 +129,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         ethernet_button.setOnClickListener {
+
+            val success = RootUtil.executeAsRoot("ifconfig eth0 down").first
+
+            if (success) {
+                val success = RootUtil.executeAsRoot("ifconfig eth0 up").first
+                if (!success) {
+                    return@setOnClickListener
+                }
+            }
+
             connectivityManager.requestNetwork(ethernetRequest, object : ConnectivityManager.NetworkCallback() {
                 override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
                     super.onBlockedStatusChanged(network, blocked)
