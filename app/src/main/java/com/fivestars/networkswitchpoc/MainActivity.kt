@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                     GlobalScope.launch {
                         fetchIp(network)
                     }
+                    connectivityManager.unregisterNetworkCallback(this)
                 }
             })
         }
@@ -124,6 +125,7 @@ class MainActivity : AppCompatActivity() {
                             Toast.makeText(this@MainActivity, "IP is: " +ipAddress, Toast.LENGTH_SHORT).show()
                         }
                     }
+                    connectivityManager.unregisterNetworkCallback(this)
                 }
             })
         }
@@ -177,6 +179,7 @@ class MainActivity : AppCompatActivity() {
                             Toast.makeText(this@MainActivity, "IP is: " +ipAddress, Toast.LENGTH_SHORT).show()
                         }
                     }
+                    connectivityManager.unregisterNetworkCallback(this)
                 }
             })
         }
