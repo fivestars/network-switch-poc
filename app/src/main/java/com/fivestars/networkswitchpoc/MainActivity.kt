@@ -12,6 +12,10 @@ import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.fivestars.rootutil.RootUtil
+import fr.bmartel.speedtest.SpeedTestReport
+import fr.bmartel.speedtest.SpeedTestSocket
+import fr.bmartel.speedtest.inter.ISpeedTestListener
+import fr.bmartel.speedtest.model.SpeedTestError
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,7 +34,9 @@ class MainActivity : AppCompatActivity() {
     private val wifiRequest: NetworkRequest = NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI).build()
     private val ethernetRequest: NetworkRequest = NetworkRequest.Builder().addTransportType(
         TRANSPORT_ETHERNET).build()
-    
+
+
+
     private var networkInstance: Network? = null
     set(value) {
         field = value
@@ -47,6 +53,42 @@ class MainActivity : AppCompatActivity() {
             loadUrl("http://icanhazip.com")
         }
 
+        speed_test.setOnClickListener {
+            speed_status.text = "Running Speed Test"
+            val speedTestSocket = SpeedTestSocket()
+
+            speedTestSocket.addSpeedTestListener(object : ISpeedTestListener {
+                override fun onCompletion(report: SpeedTestReport) {
+                    // called when download/upload is complete
+                    println("[COMPLETED] rate in octet/s : " + report.transferRateOctet)
+                    println("[COMPLETED] rate in bit/s   : " + report.transferRateBit)
+
+                    GlobalScope.launch(Dispatchers.Main) {
+                        speed_status.text =
+                            "bit/s   : " + report.transferRateBit
+                    }
+                }
+
+                override fun onError(
+                    speedTestError: SpeedTestError,
+                    errorMessage: String
+                ) {
+                    // called when a download/upload error occur
+                }
+
+                override fun onProgress(percent: Float, report: SpeedTestReport) {
+                    // called to notify download/upload progress
+                    println("[PROGRESS] progress : $percent%")
+                    println("[PROGRESS] rate in octet/s : " + report.transferRateOctet)
+                    println("[PROGRESS] rate in bit/s   : " + report.transferRateBit)
+                }
+            })
+
+            GlobalScope.launch(Dispatchers.IO) {
+                speedTestSocket.startDownload("http://ashburn.va.speedtest.frontier.com:8080/speedtest/random4000x4000.jpg");
+            }
+        }
+
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         cellular_button.setOnClickListener {
@@ -59,6 +101,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         wifi_button.setOnClickListener {
+            val dropEthSuccess = RootUtil.executeAsRoot("ifconfig eth0 down").first
+
+            val success = RootUtil.executeAsRoot("ifconfig wlan0 down").first
+
+            if (success) {
+                val success = RootUtil.executeAsRoot("ifconfig wlan0 up").first
+                if (!success) {
+                    return@setOnClickListener
+                }
+            }
+
             connectivityManager.requestNetwork(wifiRequest, object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
@@ -131,7 +184,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun postConnect(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
-        Toast.makeText(this@MainActivity, connectionType + " is ready", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivity, "$connectionType is ready", Toast.LENGTH_SHORT).show()
         Log.e(TAG, "network info is: $network")
         Log.e(TAG, "network is metered: " +connectivityManager.isActiveNetworkMetered)
         Log.e(TAG, "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
@@ -142,27 +195,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         connectivityManager.unregisterNetworkCallback(networkCallback)
-    }
-
-    suspend fun fetchIp(network: Network): String? = withContext(Dispatchers.IO) {
-
-        try {
-            Log.v(TAG, "IP for www.icanhazip.com is: " +network.getByName("www.icanhazip.com"))
-            val client = OkHttpClient.Builder().socketFactory(network.socketFactory).build()
-
-            val request = Request.Builder()
-                .url("http://icanhazip.com")
-                .build();
-
-            val response = client.newCall(request).execute()
-            val result = response.body?.string()
-            Log.e(TAG, "The ip is: $result")
-            return@withContext result
-        } catch (e: Exception) {
-            Log.e(TAG, "exception: $e")
-        }
-
-        return@withContext null
     }
 
     companion object {
