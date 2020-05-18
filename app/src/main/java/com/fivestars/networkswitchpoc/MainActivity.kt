@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     set(value) {
         field = value
         reload_webview_button.isEnabled = true
+        speed_test.isEnabled = true
     }
     
     @SuppressLint("SetJavaScriptEnabled")
@@ -44,8 +45,14 @@ class MainActivity : AppCompatActivity() {
         
         reload_webview_button.isEnabled = false
         reload_webview_button.setOnClickListener {
-            loadSpeedTest()
+            loadUrl("http://icanhazip.com")
         }
+
+        speed_test.isEnabled = false
+        speed_test.setOnClickListener {
+            loadUrl("http://speedtest.pldi.net/")
+        }
+
 
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -88,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadSpeedTest() {
+    private fun loadUrl(url: String) {
         webView.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(
                 view: WebView,
@@ -127,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         val webSettings: WebSettings = webView.getSettings()
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
-        webView.loadUrl("http://icanhazip.com")
+        webView.loadUrl(url)
     }
 
     private fun postConnect(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
