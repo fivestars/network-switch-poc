@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                 request: WebResourceRequest
             ): WebResourceResponse? {
                 if (networkInstance != null) {
-                    try {
+                    try {z
                         val client = OkHttpClient.Builder().socketFactory(networkInstance!!.socketFactory).build()
 
                         val call: Call = client.newCall(
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun postConnect(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
-        Toast.makeText(this@MainActivity, connectionType, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivity, connectionType + "is ready", Toast.LENGTH_SHORT).show()
         Log.e(TAG, "network info is: $network")
         Log.e(TAG, "network is metered: " +connectivityManager.isActiveNetworkMetered)
         Log.e(TAG, "bind is tru: " +connectivityManager.bindProcessToNetwork(network))
