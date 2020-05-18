@@ -8,9 +8,7 @@ import android.net.NetworkCapabilities.*
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
-import android.view.ViewGroup
 import android.webkit.*
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.fivestars.rootutil.RootUtil
@@ -19,12 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
@@ -99,46 +96,26 @@ class MainActivity : AppCompatActivity() {
             ): WebResourceResponse? {
                 if (networkInstance != null) {
                     try {
-                        val url = URL(request.url.toString())
-                        val connection: HttpURLConnection =
-                            networkInstance?.openConnection(url) as HttpURLConnection
-                        connection.setDoOutput(true)
-                        connection.setRequestMethod(request.method)
-                        for ((key, value) in request.requestHeaders) {
-                            connection.setRequestProperty(key, value)
-                        }
-                        val responseCode: Int = connection.getResponseCode()
-                        val responseMessage: String = connection.getResponseMessage()
-                        var contentType: String = connection.getContentType()
-                        var encoding: String? = connection.getContentEncoding()
+                        val client = OkHttpClient.Builder().socketFactory(networkInstance!!.socketFactory).build()
 
-                        // Transform response headers from Map<String, List<String>> to Map<String, String>
-                        val headerFields: HashMap<String?, String?> = HashMap()
-                        connection.headerFields.map {
-                            headerFields.put(it.key, it.value[0])
-                        }
-                        val contentTypeData =
-                            contentType.split(";\\s?").toTypedArray()
-                        contentType = contentTypeData[0]
-                        if (contentTypeData.size > 1) {
-                            encoding = contentTypeData[1]
-                        }
-                        if (contentType.contains("text") && encoding == null) {
-                            encoding = "utf-8"
-                        }
-                        val inputStream: InputStream
-                        inputStream = try {
-                            connection.getInputStream()
-                        } catch (e: java.lang.Exception) {
-                            connection.getErrorStream()
-                        }
+                        val call: Call = client.newCall(
+                            Request.Builder()
+                                .url(request.url.toString())
+                                .build()
+                        )
+
+                        val response: Response = call.execute()
+
                         return WebResourceResponse(
-                            contentType,
-                            encoding,
-                            responseCode,
-                            responseMessage,
-                            headerFields,
-                            inputStream
+                            response.header(
+                                "content-type",
+                                "text/plain"
+                            ),  // You can set something other as default content-type
+                            response.header(
+                                "content-encoding",
+                                "utf-8"
+                            ),  // Again, you can set another encoding as default
+                            response.body?.byteStream()
                         )
                     } catch (e: IOException) {
                         e.printStackTrace()
@@ -171,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
         try {
             Log.v(TAG, "IP for www.icanhazip.com is: " +network.getByName("www.icanhazip.com"))
-            val client = OkHttpClient();
+            val client = OkHttpClient.Builder().socketFactory(network.socketFactory).build()
 
             val request = Request.Builder()
                 .url("http://icanhazip.com")
