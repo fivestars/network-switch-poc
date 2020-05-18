@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     set(value) {
         field = value
         reload_webview_button.isEnabled = true
-        speed_test.isEnabled = true
     }
     
     @SuppressLint("SetJavaScriptEnabled")
@@ -47,12 +46,6 @@ class MainActivity : AppCompatActivity() {
         reload_webview_button.setOnClickListener {
             loadUrl("http://icanhazip.com")
         }
-
-        speed_test.isEnabled = false
-        speed_test.setOnClickListener {
-            loadUrl("http://speedtest.pldi.net/")
-        }
-
 
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -102,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                 request: WebResourceRequest
             ): WebResourceResponse? {
                 if (networkInstance != null) {
-                    try {z
+                    try {
                         val client = OkHttpClient.Builder().socketFactory(networkInstance!!.socketFactory).build()
 
                         val call: Call = client.newCall(
@@ -138,7 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun postConnect(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
-        Toast.makeText(this@MainActivity, connectionType + "is ready", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivity, connectionType + " is ready", Toast.LENGTH_SHORT).show()
         Log.e(TAG, "network info is: $network")
         Log.e(TAG, "network is metered: " +connectivityManager.isActiveNetworkMetered)
         Log.e(TAG, "bind is tru: " +connectivityManager.bindProcessToNetwork(network))

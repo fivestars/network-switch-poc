@@ -42,16 +42,6 @@
         app:layout_constraintLeft_toRightOf="@id/ethernet_button"
         app:layout_constraintTop_toTopOf="parent"/>
 
-<!--    <Button-->
-<!--        android:id="@+id/speed_test"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Speed"-->
-
-<!--        app:layout_constraintLeft_toRightOf="@id/reload_webview_button"-->
-<!--        app:layout_constraintTop_toTopOf="parent"/>-->
-
-
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
