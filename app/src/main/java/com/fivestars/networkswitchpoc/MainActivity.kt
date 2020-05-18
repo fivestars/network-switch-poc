@@ -55,38 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         speed_test.setOnClickListener {
             speed_status.text = "Running Speed Test"
-            val speedTestSocket = SpeedTestSocket()
-
-            speedTestSocket.addSpeedTestListener(object : ISpeedTestListener {
-                override fun onCompletion(report: SpeedTestReport) {
-                    // called when download/upload is complete
-                    println("[COMPLETED] rate in octet/s : " + report.transferRateOctet)
-                    println("[COMPLETED] rate in bit/s   : " + report.transferRateBit)
-
-                    GlobalScope.launch(Dispatchers.Main) {
-                        speed_status.text =
-                            "bit/s   : " + report.transferRateBit
-                    }
-                }
-
-                override fun onError(
-                    speedTestError: SpeedTestError,
-                    errorMessage: String
-                ) {
-                    // called when a download/upload error occur
-                }
-
-                override fun onProgress(percent: Float, report: SpeedTestReport) {
-                    // called to notify download/upload progress
-                    println("[PROGRESS] progress : $percent%")
-                    println("[PROGRESS] rate in octet/s : " + report.transferRateOctet)
-                    println("[PROGRESS] rate in bit/s   : " + report.transferRateBit)
-                }
-            })
-
-            GlobalScope.launch(Dispatchers.IO) {
-                speedTestSocket.startDownload("http://ashburn.va.speedtest.frontier.com:8080/speedtest/random4000x4000.jpg");
-            }
+            runUploadSpeedTest()
         }
 
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -95,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             connectivityManager.requestNetwork(cellularRequest, object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    postConnect(connectivityManager, network, "LTE", this)
+                    onConnectedToNetwork(connectivityManager, network, "LTE", this)
                 }
             })
         }
@@ -115,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             connectivityManager.requestNetwork(wifiRequest, object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    postConnect(connectivityManager, network, "WiFi", this)
+                    onConnectedToNetwork(connectivityManager, network, "WiFi", this)
                 }
             })
         }
@@ -135,9 +104,44 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    postConnect(connectivityManager, network, "Ethernet", this)
+                    onConnectedToNetwork(connectivityManager, network, "Ethernet", this)
                 }
             })
+        }
+    }
+
+    private fun runUploadSpeedTest() {
+        val speedTestSocket = SpeedTestSocket()
+
+        speedTestSocket.addSpeedTestListener(object : ISpeedTestListener {
+            override fun onCompletion(report: SpeedTestReport) {
+                // called when download/upload is complete
+                println("[COMPLETED] rate in octet/s : " + report.transferRateOctet)
+                println("[COMPLETED] rate in bit/s   : " + report.transferRateBit)
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    speed_status.text =
+                        "DL Mbps : " + (report.transferRateBit.toDouble() / 1000000)
+                }
+            }
+
+            override fun onError(
+                speedTestError: SpeedTestError,
+                errorMessage: String
+            ) {
+                // called when a download/upload error occur
+            }
+
+            override fun onProgress(percent: Float, report: SpeedTestReport) {
+                // called to notify download/upload progress
+                println("[PROGRESS] progress : $percent%")
+                println("[PROGRESS] rate in octet/s : " + report.transferRateOctet)
+                println("[PROGRESS] rate in bit/s   : " + report.transferRateBit)
+            }
+        })
+
+        GlobalScope.launch(Dispatchers.IO) {
+            speedTestSocket.startDownload("http://ashburn.va.speedtest.frontier.com:8080/speedtest/random4000x4000.jpg");
         }
     }
 
@@ -183,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         webView.loadUrl(url)
     }
 
-    private fun postConnect(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
+    private fun onConnectedToNetwork(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
         Toast.makeText(this@MainActivity, "$connectionType is ready", Toast.LENGTH_SHORT).show()
         Log.e(TAG, "network info is: $network")
         Log.e(TAG, "network is metered: " +connectivityManager.isActiveNetworkMetered)
