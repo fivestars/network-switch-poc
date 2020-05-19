@@ -201,7 +201,7 @@ class MainActivity : AppCompatActivity() {
                         Parse.parseNetworkInfo(executeCommand("ip -s -o link", "\n")!!)
                     }
 
-                    download_status.text =
+                    upload_status.text =
                         "UL Mbps : " + decimalFormat.format((report.transferRateBit.toDouble() / 1000000)) + " Mbps - Packet Loss: ${PacketLoss.calculatePacketLoss(PacketLoss.before!!, PacketLoss.after!!)}"
                 }
             }
