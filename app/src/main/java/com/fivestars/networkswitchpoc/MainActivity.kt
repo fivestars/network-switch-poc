@@ -89,6 +89,8 @@ class MainActivity : AppCompatActivity() {
                             switch_report.text = "Switch $i of 100"
                         }
 
+                        startSwitchTime = System.currentTimeMillis()
+
                         val switchEthernetTime =
                             withContext(Dispatchers.IO) { switchToEthernet(connectivityManager) }
                         Switch.ethernetSwitch.add(switchEthernetTime - startSwitchTime)
@@ -108,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     switch_report.text =
                         "Max wifi switch time ${Switch.wifiSwitch.max()} - Max ethernet switch time ${Switch.ethernetSwitch.max()}\n" +
-                                "Avg wifi switch time ${Switch.wifiSwitch.average()} - Max ethernet switch time ${Switch.ethernetSwitch.average()}\n" +
+                                "Avg wifi switch time ${Switch.wifiSwitch.average()} - Avg ethernet switch time ${Switch.ethernetSwitch.average()}\n" +
                                 "Min wifi switch time ${Switch.wifiSwitch.min()} - Min ethernet switch time ${Switch.ethernetSwitch.min()}"
                 }
 
