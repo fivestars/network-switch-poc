@@ -51,6 +51,16 @@
             app:layout_constraintLeft_toRightOf="@id/reload_webview_button"
             app:layout_constraintTop_toTopOf="parent"/>
 
+    <Button
+        android:id="@+id/switch_report_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch stats"
+
+        app:layout_constraintLeft_toRightOf="@id/speed_test"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
     <TextView
         android:id="@+id/switch_time"
         android:layout_width="wrap_content"
@@ -76,11 +86,19 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/download_status"/>
 
+    <TextView
+        android:id="@+id/switch_report"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch Stats"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_status"/>
+
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/upload_status"/>
+        app:layout_constraintTop_toBottomOf="@id/switch_report"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
