@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Parse {
 
-    public static ParsedNetworkData parseNetworkInfo(String networkData) {
+    public static ParsedNetworkData parseNetworkInfo(String networkData, String networkInterface) {
 
         ParsedNetworkData pNetData = new ParsedNetworkData();
 
@@ -16,7 +16,7 @@ public class Parse {
         if (pNetData.rxData.size() > 0) pNetData.rxData.clear();
 
         for (String parsedNetworkDatum : parsedNetworkData) {
-            if (parsedNetworkDatum.contains("wlan")) {
+            if (parsedNetworkDatum.contains(networkInterface)) {
                 wlanData = parsedNetworkDatum;
             }
         }
