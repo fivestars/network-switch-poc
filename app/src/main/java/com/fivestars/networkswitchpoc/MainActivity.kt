@@ -248,41 +248,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadUrl(url: String) {
-        webView.webViewClient = object : WebViewClient() {
-            override fun shouldInterceptRequest(
-                view: WebView,
-                request: WebResourceRequest
-            ): WebResourceResponse? {
-                if (networkInstance != null) {
-                    try {
-                        val client = OkHttpClient.Builder().socketFactory(networkInstance!!.socketFactory).build()
-
-                        val call: Call = client.newCall(
-                            Request.Builder()
-                                .url(request.url.toString())
-                                .build()
-                        )
-
-                        val response: Response = call.execute()
-
-                        return WebResourceResponse(
-                            response.header(
-                                "content-type",
-                                "text/plain"
-                            ),  // You can set something other as default content-type
-                            response.header(
-                                "content-encoding",
-                                "utf-8"
-                            ),  // Again, you can set another encoding as default
-                            response.body?.byteStream()
-                        )
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                }
-                return super.shouldInterceptRequest(view, request)
-            }
-        }
+        webView.webViewClient = WebViewClient()
+//        webView.webViewClient = object : WebViewClient() {
+//            override fun shouldInterceptRequest(
+//                view: WebView,
+//                request: WebResourceRequest
+//            ): WebResourceResponse? {
+//                if (networkInstance != null) {
+//                    try {
+//                        val client = OkHttpClient.Builder().socketFactory(networkInstance!!.socketFactory).build()
+//
+//                        val call: Call = client.newCall(
+//                            Request.Builder()
+//                                .url(request.url.toString())
+//                                .build()
+//                        )
+//
+//                        val response: Response = call.execute()
+//
+//                        return WebResourceResponse(
+//                            response.header(
+//                                "content-type",
+//                                "text/plain"
+//                            ),  // You can set something other as default content-type
+//                            response.header(
+//                                "content-encoding",
+//                                "utf-8"
+//                            ),  // Again, you can set another encoding as default
+//                            response.body?.byteStream()
+//                        )
+//                    } catch (e: IOException) {
+//                        e.printStackTrace()
+//                    }
+//                }
+//                return super.shouldInterceptRequest(view, request)
+//            }
+//        }
         val webSettings: WebSettings = webView.getSettings()
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
