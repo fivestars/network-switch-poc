@@ -52,12 +52,21 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
+        android:id="@+id/switch_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch time"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/speed_test"/>
+
+
+    <TextView
         android:id="@+id/download_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Download Stats"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/speed_test"/>
+        app:layout_constraintTop_toBottomOf="@id/switch_time"/>
 
     <TextView
         android:id="@+id/upload_status"

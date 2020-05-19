@@ -30,6 +30,7 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.text.DecimalFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     var pattern = "#.##"
     var decimalFormat = DecimalFormat(pattern)
     var networkReference = "wlan"
+    var startSwitch: Long = 0
+    var switchTime: Long = 0
 
     private var networkInstance: Network? = null
     set(value) {
@@ -69,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         cellular_button.setOnClickListener {
+            startSwitch = System.currentTimeMillis()
             connectivityManager.requestNetwork(cellularRequest, object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         wifi_button.setOnClickListener {
+
             val dropEthSuccess = RootUtil.executeAsRoot("ifconfig eth0 down").first
 
             val success = RootUtil.executeAsRoot("ifconfig wlan0 down").first
@@ -89,6 +94,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            startSwitch = System.currentTimeMillis()
             connectivityManager.requestNetwork(wifiRequest, object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
@@ -108,6 +114,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            startSwitch = System.currentTimeMillis()
             connectivityManager.requestNetwork(ethernetRequest, object : ConnectivityManager.NetworkCallback() {
 
                 override fun onAvailable(network: Network) {
@@ -283,6 +290,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onConnectedToNetwork(connectivityManager: ConnectivityManager, network: Network, connectionType: String, networkCallback: ConnectivityManager.NetworkCallback) {
+        switchTime = System.currentTimeMillis() - startSwitch
         Toast.makeText(this@MainActivity, "$connectionType is ready", Toast.LENGTH_SHORT).show()
         networkReference = connectionType
         Log.e(TAG, "network info is: $network")
@@ -292,6 +300,7 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
                 networkInstance = network
+                switch_time.text = "Switch Time: $switchTime ms"
             }
         }
         connectivityManager.unregisterNetworkCallback(networkCallback)
