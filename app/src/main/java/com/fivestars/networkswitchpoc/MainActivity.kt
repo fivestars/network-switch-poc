@@ -4,20 +4,20 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
-import android.net.NetworkCapabilities.TRANSPORT_WIFI
+import android.net.NetworkCapabilities.*
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import io.sentry.android.core.SentryAndroid
+import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.core.Sentry
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import java.lang.Thread.sleep
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,10 +25,14 @@ import kotlin.coroutines.suspendCoroutine
 class MainActivity : AppCompatActivity() {
 
     private val wifiRequest: NetworkRequest =
-        NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI).build()
-    private val ethernetRequest: NetworkRequest = NetworkRequest.Builder().addTransportType(
-        TRANSPORT_ETHERNET
-    ).build()
+        NetworkRequest.Builder()
+            .addTransportType(TRANSPORT_WIFI)
+            .addCapability(NET_CAPABILITY_INTERNET)
+            .build()
+    private val ethernetRequest: NetworkRequest = NetworkRequest.Builder()
+        .addTransportType(TRANSPORT_ETHERNET)
+        .addCapability(NET_CAPABILITY_INTERNET)
+        .build()
 
     private var currentNetwork: Network? = null
 
@@ -36,9 +40,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        webView.webViewClient = WebViewClient()
 
+        SentryAndroid.init(
+            this
+        ) { options: SentryAndroidOptions ->
+            options.dsn = "https://6e6b179309ce42d29bd69f73cef07bee@o7041.ingest.sentry.io/5286023"
+        }
 
         val connectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -83,13 +92,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun switchToEthernet(connectivityManager: ConnectivityManager): Long {
-        delay(5000)
+        delay(10000)
         Log.e("Darran", "Switching to ethernet")
         return switchNetwork(ethernetRequest, connectivityManager)
     }
 
     private suspend fun switchToWifi(connectivityManager: ConnectivityManager): Long {
-        delay(5000)
+        delay(10000)
         Log.e("Darran", "Switching to wifi")
         return switchNetwork(wifiRequest, connectivityManager)
     }
@@ -118,6 +127,7 @@ class MainActivity : AppCompatActivity() {
                         connectivityManager.unregisterNetworkCallback(this)
                         currentNetwork = network
                         connectivityManager.bindProcessToNetwork(network)
+                        connectivityManager.reportNetworkConnectivity(network, true)
                         continuation.resume(network.networkHandle)
                     }
                 })
