@@ -6,6 +6,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities.*
 import android.net.NetworkRequest
+import android.net.wifi.WifiManager
+import android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
@@ -51,6 +53,11 @@ class MainActivity : AppCompatActivity() {
 
         val connectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val wifiManager =
+            getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        wifiManager.createWifiLock(WIFI_MODE_FULL_HIGH_PERF, "networkSwitchPoC")
 
         GlobalScope.launch {
             while (true) {
