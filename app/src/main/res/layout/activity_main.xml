@@ -31,7 +31,7 @@
         android:text="ETHERNET"
 
         app:layout_constraintLeft_toRightOf="@id/wifi_button"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/reload_webview_button"
@@ -40,16 +40,16 @@
         android:text="IP in WebView"
 
         app:layout_constraintLeft_toRightOf="@id/ethernet_button"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/speed_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Speed"
+    <Button
+        android:id="@+id/speed_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Speed"
 
-            app:layout_constraintLeft_toRightOf="@id/reload_webview_button"
-            app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintLeft_toRightOf="@id/reload_webview_button"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/switch_report_button"
@@ -58,7 +58,7 @@
         android:text="Switch stats"
 
         app:layout_constraintLeft_toRightOf="@id/speed_test"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:text="Switch time"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/speed_test"/>
+        app:layout_constraintTop_toBottomOf="@id/speed_test" />
 
 
     <TextView
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:text="Download Stats"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/switch_time"/>
+        app:layout_constraintTop_toBottomOf="@id/switch_time" />
 
     <TextView
         android:id="@+id/upload_status"
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:text="Upload Stats"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/download_status"/>
+        app:layout_constraintTop_toBottomOf="@id/download_status" />
 
     <TextView
         android:id="@+id/switch_report"
@@ -92,13 +92,13 @@
         android:layout_height="wrap_content"
         android:text="Switch Stats"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/upload_status"/>
+        app:layout_constraintTop_toBottomOf="@id/upload_status" />
 
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/switch_report"/>
+        app:layout_constraintTop_toBottomOf="@id/switch_report" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

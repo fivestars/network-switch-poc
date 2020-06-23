@@ -4,28 +4,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkCapabilities.*
+import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
+import android.net.NetworkCapabilities.TRANSPORT_WIFI
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import fr.bmartel.speedtest.SpeedTestReport
-import fr.bmartel.speedtest.SpeedTestSocket
-import fr.bmartel.speedtest.inter.ISpeedTestListener
-import fr.bmartel.speedtest.model.SpeedTestError
 import io.sentry.core.Sentry
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import java.io.BufferedReader
-import java.io.DataOutputStream
-import java.io.IOException
-import java.io.InputStreamReader
-import java.text.DecimalFormat
-import java.time.Duration
+import java.lang.Thread.sleep
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -52,21 +43,32 @@ class MainActivity : AppCompatActivity() {
         val connectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch {
             while (true) {
-                switchToWifi(connectivityManager)
+
+                val wifiId = switchToWifi(connectivityManager)
+                Log.e("Darran", wifiId.toString() + " finished")
+
                 withContext(Dispatchers.Main) {
                     loadUrl("http://www.fivestars.com")
                 }
-                delay(TimeUnit.MINUTES.toMillis(1))
-                switchToEthernet(connectivityManager)
+
+                val ethernetId = switchToEthernet(connectivityManager)
+                Log.e("Darran", ethernetId.toString() + " finished")
+
                 withContext(Dispatchers.Main) {
                     loadUrl("http://www.fivestars.com")
                 }
+
             }
         }
 
         webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                Log.e("Darran", url + " finished")
+            }
+
             override fun onReceivedError(
                 view: WebView?,
                 errorCode: Int,
@@ -74,16 +76,21 @@ class MainActivity : AppCompatActivity() {
                 failingUrl: String?
             ) {
                 super.onReceivedError(view, errorCode, description, failingUrl)
-                Sentry.captureException(Throwable("Network: :" +currentNetwork?.networkHandle + " " +description))
+                Log.e("Darran", "Network: :" + currentNetwork?.networkHandle + " " + description)
+                Sentry.captureException(Throwable("Network: :" + currentNetwork?.networkHandle + " " + description))
             }
         }
     }
 
     private suspend fun switchToEthernet(connectivityManager: ConnectivityManager): Long {
+        delay(5000)
+        Log.e("Darran", "Switching to ethernet")
         return switchNetwork(ethernetRequest, connectivityManager)
     }
 
     private suspend fun switchToWifi(connectivityManager: ConnectivityManager): Long {
+        delay(5000)
+        Log.e("Darran", "Switching to wifi")
         return switchNetwork(wifiRequest, connectivityManager)
     }
 
@@ -110,6 +117,7 @@ class MainActivity : AppCompatActivity() {
                         super.onAvailable(network)
                         connectivityManager.unregisterNetworkCallback(this)
                         currentNetwork = network
+                        connectivityManager.bindProcessToNetwork(network)
                         continuation.resume(network.networkHandle)
                     }
                 })
