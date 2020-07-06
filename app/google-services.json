@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "741951972550",
+    "firebase_url": "https://network-switch-poc.firebaseio.com",
+    "project_id": "network-switch-poc",
+    "storage_bucket": "network-switch-poc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741951972550:android:ad4af2c17a3e33bef1e3c7",
+        "android_client_info": {
+          "package_name": "com.fivestars.networkswitchpoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741951972550-m7k8ul18c1lmh4vtrns7p4l2eddl1si2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGSFIPOZxqt8Zk5X6B8eN6ErV4yt4c3j4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741951972550-m7k8ul18c1lmh4vtrns7p4l2eddl1si2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

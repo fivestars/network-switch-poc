@@ -1,6 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
 
 android {
     compileSdkVersion 29
@@ -42,6 +45,7 @@ dependencies {
     implementation project(path: ':rootutil-release')
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
     compile 'fr.bmartel:jspeedtest:1.32.1'
+    implementation('com.google.firebase:firebase-crashlytics:17.1.0')
 
     implementation 'io.sentry:sentry-android:2.1.7'
 

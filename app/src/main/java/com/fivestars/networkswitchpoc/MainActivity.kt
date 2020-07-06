@@ -15,11 +15,15 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.core.Sentry
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import java.lang.Exception
+import java.time.Instant
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -64,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
                 val wifiId = switchToWifi(connectivityManager)
                 Log.e("Darran", wifiId.toString() + " finished")
+                FirebaseCrashlytics.getInstance().log("$wifiId finished")
 
                 withContext(Dispatchers.Main) {
                     loadUrl("http://www.fivestars.com")
@@ -71,6 +76,8 @@ class MainActivity : AppCompatActivity() {
 
                 val ethernetId = switchToEthernet(connectivityManager)
                 Log.e("Darran", ethernetId.toString() + " finished")
+                FirebaseCrashlytics.getInstance().log("$ethernetId finished")
+
 
                 withContext(Dispatchers.Main) {
                     loadUrl("http://www.fivestars.com")
@@ -83,6 +90,8 @@ class MainActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 Log.e("Darran", url + " finished")
+
+                FirebaseCrashlytics.getInstance().log("$url finished")
             }
 
             override fun onReceivedError(
@@ -92,10 +101,22 @@ class MainActivity : AppCompatActivity() {
                 failingUrl: String?
             ) {
                 super.onReceivedError(view, errorCode, description, failingUrl)
+
+                try {
+                    FirebaseCrashlytics.getInstance()
+                        .recordException(Throwable("Network: :" + currentNetwork?.networkHandle + " " + description))
+                } catch (e: Exception) {
+                    // nothing
+                }
                 Log.e("Darran", "Network: :" + currentNetwork?.networkHandle + " " + description)
                 Sentry.captureException(Throwable("Network: :" + currentNetwork?.networkHandle + " " + description))
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        FirebaseCrashlytics.getInstance().recordException(Throwable("Application shutting down at ${System.currentTimeMillis()}"))
     }
 
     private suspend fun switchToEthernet(connectivityManager: ConnectivityManager): Long {
